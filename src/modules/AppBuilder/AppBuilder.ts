@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+import {AssetsLoader, ResourceType} from "@/modules/AppBuilder/AssetsLoader";
 
 // черновой вариант
 
@@ -11,6 +11,8 @@ export class AppBuilder {
   public threeCamera: THREE.PerspectiveCamera;
 
   // public clock: THREE.Clock;
+
+  public assetsLoader = new AssetsLoader();
 
   constructor() {
     this.threeScene = new THREE.Scene();
@@ -62,7 +64,6 @@ export class AppBuilder {
   }
 
 
-
   public makeThreeCamera(): THREE.PerspectiveCamera {
     const camera = new THREE.PerspectiveCamera(78, window.innerWidth / window.innerHeight, 1, 100);
 
@@ -73,12 +74,15 @@ export class AppBuilder {
   }
 
   public loadModel(): void {
-    const loader = new GLTFLoader();
-    loader.load('/3d/glb/house.glb', (gltf) => {
-      this.threeScene.add(gltf.scene);
-      gltf.scene.position.set(0, 0, 0);
-      gltf.scene.scale.set(0.1, 0.1, 0.1)
-    })
+    this.assetsLoader.setGLTFAssetResourse('/3d/glb/house.glb', ResourceType.GLB);
+    this.assetsLoader.loadResource()
+      .then(() => {
+        const GLTF = this.assetsLoader.getGLTFAssetResource('/3d/glb/house.glb');
+        if (!GLTF) return;
+        this.threeScene.add(GLTF.scene);
+        GLTF.scene.position.set(0, 0, 0);
+        GLTF.scene.scale.set(0.1, 0.1, 0.1)
+      });
   }
 
 
